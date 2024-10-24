@@ -90,7 +90,9 @@ def evaluate_responses(df):
             print("\nCorrect answer! More details:")
         else:
             print("\nIncorrect answer. More details:")
-        print(description)
+            print(f"The correct combo is {row['SNF_CORRECT_COMBO']}")
+        print(f"\n{description}")
+        input("\nPress any key to continue...")
 
     return dataset_results
 
