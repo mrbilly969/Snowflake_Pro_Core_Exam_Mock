@@ -63,6 +63,13 @@ def evaluate_responses(df):
         'snf_validator': [],
         'snf_time_response': []
     }
+    
+    # Create or open the results file
+    output_file = "result_file.csv"
+    # Write headers if the file does not exist
+    if not os.path.exists(output_file):
+        pd.DataFrame(columns=dataset_results.keys()).to_csv(output_file, index=False)
+
 
     # Iterate over each row in the DataFrame
     for _, row in df.iterrows():
@@ -76,13 +83,18 @@ def evaluate_responses(df):
         response = get_response()
         is_correct = response == row['SNF_CORRECT_COMBO']
         
-        # Record data for later analysis or output
-        dataset_results['snf_id'].append(row['SNF_ID'])
-        dataset_results['snf_user_response'].append(response)
-        dataset_results['snf_correct_combo'].append(row['SNF_CORRECT_COMBO'])
-        dataset_results['snf_answ_description'].append(row['SNF_ANSWER_DESCRIPTIONS'])
-        dataset_results['snf_validator'].append('Correct' if is_correct else 'Wrong')
-        dataset_results['snf_time_response'].append(datetime.now())
+        # Prepare data for the current response
+        current_result = {
+            'snf_id': row['SNF_ID'],
+            'snf_user_response': response,
+            'snf_correct_combo': row['SNF_CORRECT_COMBO'],
+            'snf_answ_description': row['SNF_ANSWER_DESCRIPTIONS'],
+            'snf_validator': 'Correct' if is_correct else 'Wrong',
+            'snf_time_response': datetime.now()
+        }
+        
+        # Append the current result to the CSV file
+        pd.DataFrame([current_result]).to_csv(output_file, mode='a', header=False, index=False)
         
         # Provide feedback to the user with detailed explanation
         description = row['SNF_ANSWER_DESCRIPTIONS']
@@ -104,7 +116,7 @@ def main():
     
     # Save results to a CSV file
     output_file = "result_file.csv"
-    pd.DataFrame(results).to_csv(output_file)
+    #pd.DataFrame(results).to_csv(output_file)
     
     # Calculate and display performance summary and total time taken
     right_wrong_counter = Counter(results['snf_validator'])
